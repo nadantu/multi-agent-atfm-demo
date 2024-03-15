@@ -1,30 +1,17 @@
 library(leaflet)
 library(sf)
-------------------------------------
+
 source("map.R")
-------------------------------------
+
+
+sector_geo_file = "data/sectors.geojson"
+sector_info_file = "data/mockup_capacity.csv"
 
 # Read GeoJSON file
-geojson_data <- st_read("data/sectors.geojson")
-plot(geojson_data)
+geojson_data <- st_read(sector_geo_file)
 
 
-# Create Leaflet map
-m <- leaflet() %>%
-    setView(lng = 115, lat = 8, zoom = 4) %>%
-    addTiles() %>%
-    addProviderTiles("CartoDB.Positron")
+plot_sector(geojson_file = sector_geo_file)
 
-# for (sector in geojson_data$geometry) {
-#     sector
-#     m <- addGeoJSON(
-#         m,
-#         geojson = sector,
-#         stroke = TRUE,
-#         color = "green",
-#         fillOpacity = 0.7,
-#         opacity = 0.6
-#         )
-#}
 
-plot_map(geojson_file = "data/sectors.geojson")
+plot_geographical_map(geojson_file = sector_geo_file, csv_file = sector_info_file)
