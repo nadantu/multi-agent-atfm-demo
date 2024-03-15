@@ -20,3 +20,14 @@ get_sector_color <- function(name, csv_data){
     return("blue")
   }
 }
+
+get_color_list <- function(capacity_data){
+  index = 1
+  color_list = c()
+  for (sector in capacity_data$name) {
+    color = get_sector_color(sector, capacity_data)
+    color_list[[index]] = color
+    index = index + 1
+  }
+  return(color_list)
+}
