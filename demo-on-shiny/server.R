@@ -1,4 +1,5 @@
 library(rjson)
+library(gridtext)
 library(glue)
 library(shiny)
 library(circlize)
@@ -11,7 +12,7 @@ heatmap_list = fromJSON(file="3-hour-day-1-resolution-steps-data.json")
 info_list = fromJSON(file="3-hour-day-1-heatmap-additional-data.json")
 geojson_data = geojson_read("sectors.geojson")
 
-col_fun = colorRamp2(c(0, 2, 4), c("skyblue", "gold", "red"))
+col_fun = colorRamp2(c(0, 3, 6), c("skyblue", "gold", "red"))
 
 get_heatmap = function(heatmap_list, iteration_step) {
   heatmap_data = matrix(
@@ -20,18 +21,44 @@ get_heatmap = function(heatmap_list, iteration_step) {
   rownames(heatmap_data) = info_list$row_name
   colnames(heatmap_data) = info_list$column_name
   
+  flight_chosen = info_list$`atfm-measurement`[[iteration_step]][[1]]
+  action_chosen = info_list$`atfm-measurement`[[iteration_step]][[2]]
+  if (action_chosen == 0) {
+    action = "Finalize flight plan"
+  } else {
+    action = "Shift to next timeslot"
+  }
+
   ht = Heatmap(
     heatmap_data,
     name = "Overcapacity",
     col = col_fun,
     row_title = "Sector",
-    column_title = "Timeslot",
+    column_title = gt_render(
+      paste0(
+        "<span style='font-size:18pt; color:black'>**Resolution step:** ",
+        iteration_step,
+        "</span><br><br>",
+        "<span style='font-size:14pt; color:black'>**ATFM Measurement:**<br>",
+        glue("**Flight**: {flight_chosen}, **Action**: {action}."),
+        "</span><br><br>",
+        "Timeslot"
+      ), 
+      r = unit(2, "pt"), 
+      padding = unit(c(2, 2, 2, 2), "pt")
+    ),
     cluster_rows = FALSE,
     show_row_dend = FALSE,
     row_names_gp = gpar(fontsize = 9),
     show_column_names = FALSE,
     cluster_columns = FALSE,
-    show_column_dend = FALSE
+    show_column_dend = FALSE,
+    heatmap_legend_param = list(
+      legend_height = unit(6, "cm"),
+      legend_width = unit(3, "cm"),
+      labels_gp = gpar(font = 6),
+      title_position = "leftcenter-rot"
+    )
   )
   ht = draw(ht)
 }
