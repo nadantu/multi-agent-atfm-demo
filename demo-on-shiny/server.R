@@ -91,12 +91,40 @@ click_action = function(df, input, output, session) {
     
     overcapacity_info = heatmap_data[, column_index_name]
     
+    rr <- tags$div(
+      HTML(glue(
+        '<img border="0" alt="Sector: {row_index_name}
+        ATFM Measurement:<TBD>" width="300" height="300"> </a>'
+        ))
+    )
+    
+    tag.map.title <- tags$style(HTML("
+      .leaflet-control.map-title { 
+        transform: translate(-50%,20%);
+        position: fixed !important;
+        left: 50%;
+        text-align: center;
+        padding-left: 10px; 
+        padding-right: 10px; 
+        background: rgba(255,255,255,0.75);
+        font-weight: bold;
+        font-size: 28px;
+      }
+    "))
+    
+    title <- tags$div(
+      tag.map.title, HTML(glue(
+      "Sector: {row_index_name} ATFM Measurement: TBD"
+      ))
+    )  
+
     # Create a map object, with initial location set to the Asia-Pacific region
     map = leaflet() %>%
       addTiles() %>%
       addProviderTiles("CartoDB.Positron") %>%
+      addControl(title, position = "bottomleft") %>%
       setView(lng = 115, lat = 8, zoom = 4)
-    
+      
     for (sector in geojson_data$features) {
       sector_name = sector$properties$index
       color = get_sector_color(sector_name, overcapacity_info)
